@@ -11,11 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { ArrowRight, GithubIcon, Loader } from "lucide-react";
-import { ReactElement, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
 const LoginForm = () => {
-  const [isPending, gitHubTransition] = useTransition();
+  const router = useRouter();
+  const [isGithubPending, gitHubTransition] = useTransition();
+  const [isEmailPending, EmailTransition] = useTransition();
 
   const handleGithubLogin = async () => {
     gitHubTransition(async () => {
@@ -36,6 +39,27 @@ const LoginForm = () => {
     });
   };
 
+
+  const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let email = e.currentTarget.email.value as string;
+    EmailTransition(async () => {
+      await authClient.emailOtp.sendVerificationOtp({
+        email,
+        type : "sign-in",
+        fetchOptions : {
+          onSuccess : () => {
+            toast.success("Verification email sent! Please check your inbox.");
+            router.push(`/verify-email?email=${email}`);
+          },
+          onError : () => {
+            toast.error("Error sending verification email.");
+          }
+        }
+      })
+    })
+  };
+
   return (
     <Card>
       <CardHeader className="text-center">
@@ -43,10 +67,11 @@ const LoginForm = () => {
         <CardDescription>Login using your Github or Email account.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <Button disabled={isPending} variant="outline" onClick={handleGithubLogin} className="w-full">
-          {isPending ? (
+        <Button disabled={isGithubPending} variant="outline" onClick={handleGithubLogin} className="w-full">
+          {isGithubPending ? (
             <>
               <Loader  className="size-4 animate-spin"/>
+              <span>Signing in with Github...</span>
             </>
           ) : (
             <>
@@ -62,11 +87,20 @@ const LoginForm = () => {
           </span>
         </div>
 
-        <form className="grid gap-4">
+        <form onSubmit={handleEmailLogin} className="grid gap-4">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="email@example.com" />
-          <Button type="submit">
-            Continue with email <ArrowRight />
+          <Input id="email" type="email" placeholder="email@example.com"/>
+          <Button type="submit" disabled={isEmailPending}>
+            {isEmailPending ? (
+              <>
+                <Loader className="size-4 animate-spin"/>
+                <span>Sending verification email...</span>
+              </>
+            ) : (
+              <>
+                Continue with email <ArrowRight />
+              </>
+            )}
           </Button>
         </form>
       </CardContent>

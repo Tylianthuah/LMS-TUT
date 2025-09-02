@@ -18,7 +18,6 @@ import { Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { email } from "zod";
 
 const VerifyEmail = () => {
   const router = useRouter();

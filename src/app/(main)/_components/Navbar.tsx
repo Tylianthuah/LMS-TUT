@@ -1,12 +1,32 @@
-import ProfileButton from "@/components/ui/profile-button";
+"use client";
+
+import ProfileButton from "@/app/(main)/_components/profile-button";
+import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const Navbar = () => {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  const signOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // redirect to home page
+          toast.success("Successfully logged out!");
+        },
+      },
+    });
+  };
+
   return (
-    <div className="px-10 flex w-full sticky justify-between min-h-16 items-center border-b z-50 bg-background/90 backdrop-blur-lg">
+    <div className="sm:px-10 px-4 flex w-full sticky top-0 left-0 justify-between min-h-16 items-center border-b z-50 bg-background/95 backdrop-blur-[backdrop-filter]:bg-background/60">
       <h1 className="font-bold text-xl tracking-tight">LMS-TUT</h1>
-      <nav className="sm:flex gap-20 items-center">
+      <nav className="hidden sm:flex sm:gap-5 md:gap-10 lg:gap-20 items-center">
         <Link
           href="/"
           className="text-sm font-semibold hover:underline hover:underline-offset-6 hover:decoration-muted-foreground"
@@ -34,7 +54,19 @@ const Navbar = () => {
       </nav>
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        <ProfileButton />
+        {isPending ? null : session ? (
+          <ProfileButton name={session.user.name} image={session.user.image || ""} email={session.user.email} signOut={signOut} />
+        ) : (
+          <Link
+            href="/login"
+            className={buttonVariants({
+              variant: "outline",
+              size: "sm",
+            })}
+          >
+            Log In
+          </Link>
+        )}
       </div>
     </div>
   );

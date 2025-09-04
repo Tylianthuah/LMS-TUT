@@ -49,7 +49,7 @@ export default function ProfileButton({ name, image, email, signOut }: ProfileBu
       <DropdownMenuContent
         className="max-w-64 pr-4"
         align="end"
-        sideOffset={20}
+        sideOffset={15}
       >
         <DropdownMenuLabel className="flex min-w-0 flex-col">
           <span className="text-foreground truncate text-sm font-medium">
@@ -65,7 +65,7 @@ export default function ProfileButton({ name, image, email, signOut }: ProfileBu
             <Link href="/">
               <HomeIcon
                 size={16}
-                className="opacity-60 mt-1"
+                className="opacity-60"
                 aria-hidden="true"
               />
               <span className="text-xs">Home</span>
@@ -75,7 +75,7 @@ export default function ProfileButton({ name, image, email, signOut }: ProfileBu
             <Link href="/courses">
               <BookOpenIcon
                 size={16}
-                className="opacity-60 mt-1"
+                className="opacity-60"
                 aria-hidden="true"
               />
               <span className="text-xs">Courses</span>
@@ -85,7 +85,7 @@ export default function ProfileButton({ name, image, email, signOut }: ProfileBu
             <Link href="/dashboard">
               <BookOpenIcon
                 size={16}
-                className="opacity-60 mt-1"
+                className="opacity-60"
                 aria-hidden="true"
               />
               <span className="text-xs">Dashboard</span>

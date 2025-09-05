@@ -5,24 +5,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+
 
 const Navbar = () => {
-  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-
-  const signOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/"); // redirect to home page
-          toast.success("Successfully logged out!");
-        },
-      },
-    });
-  };
-
   return (
     <div className="sm:px-10 px-4 flex w-full sticky top-0 left-0 justify-between min-h-16 items-center border-b z-50 bg-background/95 backdrop-blur-[backdrop-filter]:bg-background/60">
       <h1 className="font-bold text-xl tracking-tight">LMS-TUT</h1>
@@ -55,7 +41,7 @@ const Navbar = () => {
       <div className="flex items-center gap-3">
         <ThemeToggle />
         {isPending ? null : session ? (
-          <ProfileButton name={session.user.name} image={session.user.image || ""} email={session.user.email} signOut={signOut} />
+          <ProfileButton name={session.user.name} image={session.user.image || ""} email={session.user.email} />
         ) : (
           <Link
             href="/login"

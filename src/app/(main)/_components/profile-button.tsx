@@ -18,16 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import signOut from "@/hooks/sign-out";
 
 
 interface ProfileButtonProps {
   name: string;
   image: string;
   email: string | null;
-  signOut: () => Promise<void>;
 }
 
-export default function ProfileButton({ name, image, email, signOut }: ProfileButtonProps) {
+export default function ProfileButton({ name, image, email }: ProfileButtonProps) {
 
   return (
     <DropdownMenu>

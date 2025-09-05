@@ -25,26 +25,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner"
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HelpCircle, HomeIcon, Laptop2 } from "lucide-react";
+import signOut from "@/hooks/sign-out";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
-  const signOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/"); // redirect to home page
-          toast.success("Successfully logged out!");
-        },
-      },
-    });
-  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>

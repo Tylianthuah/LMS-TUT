@@ -166,6 +166,23 @@ exports.Prisma.VerificationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CourseScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  smallDescription: 'smallDescription',
+  fileKey: 'fileKey',
+  price: 'price',
+  duration: 'duration',
+  level: 'level',
+  category: 'category',
+  slug: 'slug',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -180,13 +197,24 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.CourseLevel = exports.$Enums.CourseLevel = {
+  Beginner: 'Beginner',
+  Intermediate: 'Intermediate',
+  Advanced: 'Advanced'
+};
 
+exports.CourseStatus = exports.$Enums.CourseStatus = {
+  Draft: 'Draft',
+  Published: 'Published',
+  Archived: 'Archived'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  Course: 'Course'
 };
 
 /**

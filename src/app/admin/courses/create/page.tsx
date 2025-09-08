@@ -7,8 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CourseFormData, courseSchema } from "@/lib/zodSchema";
-import { ArrowLeft, SparkleIcon } from "lucide-react";
+import {
+  courseCateogry,
+  CourseFormData,
+  courseLevel,
+  courseSchema,
+  courseStatus,
+} from "@/lib/zodSchema";
+import { ArrowLeft, Plus, SparkleIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -20,11 +26,18 @@ import {
   FormMessage,
   FormControl,
   FormLabel,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import slugify from "slugify";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import RichTextEditor from "@/components/Rich-Text-Editor/rich-text-editor";
 
 const CreateCoursePage = () => {
   const form = useForm<CourseFormData>({
@@ -33,10 +46,10 @@ const CreateCoursePage = () => {
       title: "",
       description: "",
       fileKey: "",
-      duration: 1,
-      price: 1,
+      duration: 0,
+      price: 0,
       level: "Beginner",
-      category: "",
+      category: undefined,
       smallDescription: "",
       slug: "",
       status: "Draft",
@@ -79,7 +92,7 @@ const CreateCoursePage = () => {
                         {...field}
                         placeholder="Enter course title"
                         type="text"
-                        className="placeholder:text-neutral-500 placeholder:text-xs"
+                        className=""
                       />
                     </FormControl>
                     <FormMessage />
@@ -98,7 +111,6 @@ const CreateCoursePage = () => {
                           {...field}
                           placeholder="Enter or generate slug"
                           type="text"
-                          className="placeholder:text-neutral-500 placeholder:text-xs"
                         />
                       </FormControl>
 
@@ -125,18 +137,169 @@ const CreateCoursePage = () => {
                 name="smallDescription"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Slug</FormLabel>
+                    <FormLabel>Small Description</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="enter a small description"
-                        className="min-w-[120px] placeholder:text-neutral-500 placeholder:text-xs"
+                        placeholder="Enter a small description"
                       ></Textarea>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <RichTextEditor />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="fileKey"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Thumbnail URL</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter thumbnail URL" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Categories</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {courseCateogry.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="level"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Levels</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {courseLevel.map((level) => (
+                            <SelectItem key={level} value={level}>
+                              {level}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="duration"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Duration</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter duration"
+                          type="text"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Price ($)</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter price"
+                          type="text"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {courseStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" variant="default">Create Course <Plus></Plus></Button>
             </form>
           </Form>
         </CardContent>

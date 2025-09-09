@@ -7,16 +7,25 @@ import {
 } from "../ui/tooltip";
 import { Toggle } from "../ui/toggle";
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
   Heading1,
   Heading2,
   Heading3,
   Heading4,
   Italic,
+  List,
+  ListOrdered,
+  Redo,
   Strikethrough,
   Underline,
+  Undo,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 const Menubar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) return null;
@@ -97,10 +106,7 @@ const Menubar = ({ editor }: { editor: Editor | null }) => {
             </TooltipTrigger>
             <TooltipContent>Strikethrough</TooltipContent>
           </Tooltip>
-        </div>
 
-        <div className="w-px h-6 bg-border mx-4"></div>
-        <div className="flex items-center gap-2 flex-wrap">
           <Tooltip>
             <TooltipTrigger asChild>
               <Toggle
@@ -162,19 +168,144 @@ const Menubar = ({ editor }: { editor: Editor | null }) => {
             <TooltipTrigger asChild>
               <Toggle
                 size={"sm"}
-                pressed={editor.isActive("heading", { level: 4 })}
+                pressed={editor.isActive("orderedList")}
                 onPressedChange={() => {
-                  editor.chain().focus().toggleHeading({ level: 4 }).run();
+                  editor.chain().focus().toggleOrderedList().run();
                 }}
                 className={cn(
-                  editor.isActive("heading", { level: 4 }) &&
+                  editor.isActive("orderedList") &&
                     "bg-muted text-muted-foreground"
                 )}
               >
-                <Heading4 />
+                <ListOrdered />
               </Toggle>
             </TooltipTrigger>
-            <TooltipContent>Heading 4</TooltipContent>
+            <TooltipContent>Ordered List</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                size={"sm"}
+                pressed={editor.isActive("bulletList")}
+                onPressedChange={() => {
+                  editor.chain().focus().toggleBulletList().run();
+                }}
+                className={cn(
+                  editor.isActive("bulletList") &&
+                    "bg-muted text-muted-foreground"
+                )}
+              >
+                <List />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>Bullet List</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="w-px h-6 bg-border mx-4"></div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                size={"sm"}
+                pressed={editor.isActive({ textAlign: "left" })}
+                onPressedChange={() => {
+                  editor.chain().focus().setTextAlign("left").run();
+                }}
+                className={cn(
+                  editor.isActive({ textAlign: "left" }) &&
+                    "bg-muted text-muted-foreground"
+                )}
+              >
+                <AlignLeft />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>Align Left</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                size={"sm"}
+                pressed={editor.isActive({ textAlign: "center" })}
+                onPressedChange={() => {
+                  editor.chain().focus().setTextAlign("center").run();
+                }}
+                className={cn(
+                  editor.isActive({ textAlign: "center" }) &&
+                    "bg-muted text-muted-foreground"
+                )}
+              >
+                <AlignCenter />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>Align Center</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                size={"sm"}
+                pressed={editor.isActive({ textAlign: "right" })}
+                onPressedChange={() => {
+                  editor.chain().focus().setTextAlign("right").run();
+                }}
+                className={cn(
+                  editor.isActive({ textAlign: "right" }) &&
+                    "bg-muted text-muted-foreground"
+                )}
+              >
+                <AlignRight />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>Align Right</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                size={"sm"}
+                pressed={editor.isActive({ textAlign: "justify" })}
+                onPressedChange={() => {
+                  editor.chain().focus().setTextAlign("justify").run();
+                }}
+                className={cn(
+                  editor.isActive({ textAlign: "justify" }) &&
+                    "bg-muted text-muted-foreground"
+                )}
+              >
+                <AlignJustify />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>Justify Align</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="w-px h-6 bg-border mx-4"></div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="button" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()} variant={"ghost"} size={"sm"} className={cn(
+                editor.can().undo() ? "hover:bg-muted hover:text-muted-foreground" : ""
+              )}>
+                <Undo />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Undo</TooltipContent>
+          </Tooltip>
+
+           <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="button" disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()} variant={"ghost"} size={"sm"} className={cn(
+                editor.can().redo() ? "hover:bg-muted hover:text-muted-foreground" : ""
+              )}>
+                <Redo />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Redo</TooltipContent>
           </Tooltip>
         </div>
       </TooltipProvider>

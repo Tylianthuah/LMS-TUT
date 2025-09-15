@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { Card, CardContent } from "../ui/card";
-import { RenderEmptyDropZone, RenderErrorDropZone } from "./RenderDropbox";
+import { RenderEmptyDropZone, RenderErrorDropZone, RenderUploadedFile, RenderUploadingFile } from "./RenderDropbox";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -65,8 +65,6 @@ const FileUploader = () => {
 
       const { presignedUrl, key } = await presignedResponse.json();
 
-      console.log("PresginedUrl:::",presignedUrl,"KEY:::", key)
-
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.upload.onprogress = (event) => {
@@ -98,7 +96,7 @@ const FileUploader = () => {
           reject(new Error("Uploading failed!."));
         };
         xhr.open("PUT", presignedUrl);
-        // xhr.setRequestHeader("Content-Type", file.type)        
+        xhr.setRequestHeader("Content-Type", file.type)        
         xhr.send(file);
       });
     } catch (error) {
@@ -165,7 +163,7 @@ const FileUploader = () => {
 
   function RenderState () {
     if(fileState.uploading){
-      return <h1>Uploading</h1>
+      return <RenderUploadingFile progress={fileState.progress}/>
     }
 
     if(fileState.error){
@@ -173,7 +171,7 @@ const FileUploader = () => {
     }
 
     if(fileState.objectUrl){
-      return <h1>File Uploaded!</h1>
+      return <RenderUploadedFile previewUrl={fileState.objectUrl} />
     }
 
     return <RenderEmptyDropZone isDragActive={isDragActive} />

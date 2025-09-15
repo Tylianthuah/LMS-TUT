@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
-import { CloudUploadIcon, Files, FileX } from "lucide-react";
+import { CloudUploadIcon, Files, FileX, X } from "lucide-react";
 import { Button } from "../ui/button";
+import { Progress } from "@/components/ui/progress"
+import Image from "next/image";
 
 
 export const RenderEmptyDropZone = ({
@@ -41,6 +43,28 @@ export const RenderErrorDropZone = () => {
         Please drag 'n' drop or click to{" "}
         <span className="font-bold text-sm text-primary">try again</span>.
       </p>
+    </div>
+  );
+};
+
+
+export const RenderUploadedFile = ({previewUrl} : {previewUrl : string}) => {
+  return (
+    <div >
+      <Image src={previewUrl} alt="Uploaded File" fill className="object-contain p-2"/>
+      <Button type="button" variant={"destructive"} size="icon" className={cn(
+        "absolute top-6 right-6"
+      )}>X</Button>
+    </div>
+  );
+};
+
+
+export const RenderUploadingFile = ({progress} : {progress : number}) => {
+  return (
+    <div className="w-full flex flex-col gap-3 items-center justify-center">
+      <p className="text-sm text-muted-foreground">uploading...</p>
+      <Progress value={progress} className="w-[50%]" />
     </div>
   );
 };

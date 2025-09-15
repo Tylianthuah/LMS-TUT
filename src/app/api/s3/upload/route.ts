@@ -21,14 +21,13 @@ export async function POST(request: Request) {
     if (!validation.success)
       return NextResponse.json({ error: "Invalid Request" }, { status: 400 });
 
-    console.log(validation.data);
     const { fileName, contentType, size } = validation.data;
 
     const uniqueKey = `${uuidv4()}-${fileName}`;
     const command = new PutObjectCommand({
       Bucket: env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGES,
-      // ContentType: contentType,
-      // ContentLength: size,
+      ContentType: contentType,
+      ContentLength: size,
       Key: uniqueKey,
     });
 
@@ -37,9 +36,6 @@ export async function POST(request: Request) {
       presignedUrl,
       key: uniqueKey,
     };
-
-    console.log(response);
-
     return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json(

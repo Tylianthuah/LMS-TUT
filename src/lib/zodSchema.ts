@@ -31,21 +31,23 @@ export const courseSchema = z.object({
     .min(3, { message: "Description is too short" })
     .max(500, { message: "Description is too long" }),
   fileKey: z.string().min(1, { message: "File is required" }),
-  duration: z
+  duration: z.coerce
     .number()
     .min(1, { message: "Duration must be at least 1 hour" })
     .max(500, { message: "Duration is too long" }),
-  price: z.number().min(1, { message: "Price must be a positive number" }),
-  level: z.enum( courseLevel , {
+  price: z.coerce
+    .number()
+    .min(1, { message: "Price must be a positive number" }),
+  level: z.enum(courseLevel, {
     message: "Level is required",
   }),
-  category: z.enum(courseCateogry, { message : "Category is required"}),
+  category: z.enum(courseCateogry, { message: "Category is required" }),
   smallDescription: z
     .string()
     .min(3, { message: "Small description is too short" })
     .max(200, { message: "Small description is too long" }),
   slug: z.string().min(1, { message: "Slug is required" }),
-  status: z.enum( courseStatus , {
+  status: z.enum(courseStatus, {
     message: "Status is required",
   }),
 });

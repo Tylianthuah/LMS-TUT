@@ -57,7 +57,9 @@ const CreateCoursePage = () => {
     },
   });
 
-  function onSubmit(data: CourseFormData) {}
+  function onSubmit(data: CourseFormData) {
+    console.log(data);
+  }
 
   return (
     <>
@@ -171,7 +173,7 @@ const CreateCoursePage = () => {
                   <FormItem className="w-full">
                     <FormLabel>Thumbnail URL</FormLabel>
                     <FormControl>
-                      <FileUploader />
+                      <FileUploader onChange={field.onChange} value={field.value} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -245,7 +247,7 @@ const CreateCoursePage = () => {
                         <Input
                           {...field}
                           placeholder="Enter duration"
-                          type="text"
+                          type="number"
                         />
                       </FormControl>
                       <FormMessage />
@@ -263,7 +265,7 @@ const CreateCoursePage = () => {
                         <Input
                           {...field}
                           placeholder="Enter price"
-                          type="text"
+                          type="number"
                         />
                       </FormControl>
                       <FormMessage />

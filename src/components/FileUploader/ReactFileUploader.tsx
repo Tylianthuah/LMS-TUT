@@ -1,10 +1,16 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { Card, CardContent } from "../ui/card";
-import { RenderEmptyDropZone, RenderErrorDropZone, RenderUploadedFile, RenderUploadingFile } from "./RenderDropbox";
+import {
+  RenderEmptyDropZone,
+  RenderErrorDropZone,
+  RenderUploadedFile,
+  RenderUploadingFile,
+} from "./RenderDropbox";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { on } from "events";
 
 interface UploadState {
   id: string | null;
@@ -18,7 +24,12 @@ interface UploadState {
   objectUrl?: string;
 }
 
-const FileUploader = () => {
+interface iApp {
+  onChange?: (value: string) => void;
+  value?: string;
+}
+
+const FileUploader = ({ onChange, value }: iApp) => {
   const [fileState, setFileState] = useState<UploadState>({
     error: false,
     file: null,
@@ -27,6 +38,7 @@ const FileUploader = () => {
     isDeleting: false,
     progress: 0,
     uploading: false,
+    key: value,
   });
 
   const uploadFile = async (file: File) => {
@@ -82,9 +94,10 @@ const FileUploader = () => {
               ...prev,
               uploading: false,
               progress: 100,
-              key : key,
+              key: key,
             }));
 
+            onChange?.(key);
             toast.success("File uploaded sucessfully!");
             resolve();
           } else {
@@ -96,7 +109,7 @@ const FileUploader = () => {
           reject(new Error("Uploading failed!."));
         };
         xhr.open("PUT", presignedUrl);
-        xhr.setRequestHeader("Content-Type", file.type)        
+        xhr.setRequestHeader("Content-Type", file.type);
         xhr.send(file);
       });
     } catch (error) {
@@ -104,29 +117,35 @@ const FileUploader = () => {
       setFileState((prev) => ({
         ...prev,
         progress: 0,
-        error : true,
-        uploading : false
+        error: true,
+        uploading: false,
       }));
     }
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (!acceptedFiles.length) return;
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (!acceptedFiles.length) return;
 
-    const file = acceptedFiles[0];
-    setFileState({
-      file: file,
-      error: false,
-      fileType: "image",
-      id: uuidv4(),
-      isDeleting: false,
-      progress: 0,
-      uploading: false,
-      objectUrl: URL.createObjectURL(file),
-    });
+      const file = acceptedFiles[0];
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+      setFileState({
+        file: file,
+        error: false,
+        fileType: "image",
+        id: uuidv4(),
+        isDeleting: false,
+        progress: 0,
+        uploading: false,
+        objectUrl: URL.createObjectURL(file),
+      });
 
-    uploadFile(file);
-  }, []);
+      uploadFile(file);
+    },
+    [fileState.objectUrl]
+  );
 
   const RejectedFiles = (fileRejections: FileRejection[]) => {
     if (fileRejections.length) {
@@ -152,6 +171,14 @@ const FileUploader = () => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+    };
+  }, [fileState.objectUrl]);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { "image/*": [] },
@@ -159,22 +186,83 @@ const FileUploader = () => {
     maxSize: 5 * 1024 * 1024, //5mb,
     multiple: false,
     onDropRejected: RejectedFiles,
+    disabled: fileState.uploading || !!fileState.objectUrl,
   });
 
-  function RenderState () {
-    if(fileState.uploading){
-      return <RenderUploadingFile progress={fileState.progress}/>
+  async function HandleRemoveFile() {
+    if (fileState.isDeleting || !fileState.objectUrl) return;
+    try {
+      setFileState((prev) => ({
+        ...prev,
+        isDeleting: true,
+      }));
+
+      const response = await fetch("/api/s3/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key: fileState.key,
+        }),
+      });
+      if (!response.ok) {
+        toast.error("Failed to delete file, please try again.");
+        setFileState((prev) => ({
+          ...prev,
+          isDeleting: false,
+          error: true,
+        }));
+        return;
+      }
+
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+
+      onChange?.("");
+      setFileState({
+        file: null,
+        objectUrl: undefined,
+        id: null,
+        uploading: false,
+        fileType: "image",
+        progress: 0,
+        isDeleting: false,
+        error: false,
+      });
+
+      toast.success("File deleted successfully.");
+    } catch (error) {
+      toast.error("Failed to delete file, please try again.");
+      setFileState((prev) => ({
+        ...prev,
+        isDeleting: false,
+        error: true,
+      }));
+    }
+  }
+
+  function RenderState() {
+    if (fileState.uploading) {
+      return <RenderUploadingFile progress={fileState.progress} />;
     }
 
-    if(fileState.error){
-      return <RenderErrorDropZone />
+    if (fileState.error) {
+      return <RenderErrorDropZone />;
     }
 
-    if(fileState.objectUrl){
-      return <RenderUploadedFile previewUrl={fileState.objectUrl} />
+    if (fileState.objectUrl) {
+      return (
+        <RenderUploadedFile
+          previewUrl={fileState.objectUrl}
+          handleFileRemove={HandleRemoveFile}
+          isDeleting={fileState.isDeleting}
+        />
+      );
     }
 
-    return <RenderEmptyDropZone isDragActive={isDragActive} />
+    return <RenderEmptyDropZone isDragActive={isDragActive} />;
   }
 
   return (
@@ -189,7 +277,7 @@ const FileUploader = () => {
     >
       <CardContent className="flex items-center justify-center h-full w-full ">
         <input {...getInputProps()} />
-        {RenderState()}   
+        {RenderState()}
       </CardContent>
     </Card>
   );

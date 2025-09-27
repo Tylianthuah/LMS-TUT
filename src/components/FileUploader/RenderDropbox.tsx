@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CloudUploadIcon, Files, FileX, X } from "lucide-react";
+import { CloudUploadIcon, Files, FileX, Loader, Loader2, X, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Progress } from "@/components/ui/progress"
 import Image from "next/image";
@@ -48,13 +48,19 @@ export const RenderErrorDropZone = () => {
 };
 
 
-export const RenderUploadedFile = ({previewUrl} : {previewUrl : string}) => {
+export const RenderUploadedFile = ({previewUrl , handleFileRemove , isDeleting} : {previewUrl : string , handleFileRemove : () => void , isDeleting : boolean}) => {
   return (
     <div >
       <Image src={previewUrl} alt="Uploaded File" fill className="object-contain p-2"/>
       <Button type="button" variant={"destructive"} size="icon" className={cn(
         "absolute top-6 right-6"
-      )}>X</Button>
+      )} onClick={handleFileRemove} disabled={isDeleting}>
+        {isDeleting ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <XIcon className="size-4" />
+        )}
+      </Button>
     </div>
   );
 };
